@@ -1,11 +1,13 @@
 import express from "express";
 import fs from "node:fs/promises";
 import { dogRouter } from "./routes/dogs.routes";
+import { logguer } from "./middlewares/logguer";
 
 const app = express();
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(logguer);
 
 app.use("/dogs", dogRouter);
 
