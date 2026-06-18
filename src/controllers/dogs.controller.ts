@@ -1,6 +1,7 @@
 import * as DogsService from "../services/dogs.service"
 import type { Request, Response } from "express";
 import { dogValidator } from "../types/dogs";
+import { HttpError } from "../middlewares/error";
 
 export const listDogs = async (req: Request, res: Response) => res.json(await DogsService.getDogs())
 
@@ -15,10 +16,7 @@ export const getDog = async (req: Request, res: Response) => {
 }
 
 export const createDog = async (req: Request, res: Response) => {
-  const dogData = dogValidator(req.body);
-
-  if (!dogData) return res.status(400).json({ status: 400, message: "Invalid dog data" });
-  const createdDog = await DogsService.createDog(dogData);
+  const createdDog = await DogsService.createDog(req.body);
   return res.status(201).json(createdDog);
 }
 
