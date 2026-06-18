@@ -1,0 +1,21 @@
+{
+  // Configurations de debug pour une app TypeScript exécutée via tsx.
+  // Doc : https://tsx.is/vscode
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Lance le serveur (src/main.ts) en mode debug, breakpoints actifs.
+      "name": "Debug server (tsx)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/main.ts",
+      "runtimeExecutable": "tsx",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**"
+      ]
+    },
+  ]
+}

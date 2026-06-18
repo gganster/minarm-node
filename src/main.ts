@@ -1,9 +1,11 @@
 import "./types/express.d.ts";
 import express from "express";
 import { dogRouter } from "./routes/dogs.routes";
+import {userRouter} from "./routes/users.routes.js";
 import { logguer } from "./middlewares/logguer";
 import { errorMiddleware } from "./middlewares/error";
 import { rateLimit } from 'express-rate-limit'
+import {auth} from "./middlewares/auth.js";
 
 const app = express();
 
@@ -21,7 +23,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(logguer);
 
-app.use("/dogs", dogRouter);
+app.use("/dogs", auth, dogRouter);
+app.use("/auth", userRouter)
+app.get("/health", (req, res) => res.status(200).send("ok"))
 
 app.use(errorMiddleware);
 

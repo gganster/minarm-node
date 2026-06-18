@@ -21,6 +21,8 @@ export class ForbiddenError extends HttpError {
 }
 
 export const errorMiddleware: ErrorRequestHandler = (error, req, res, next) => {
+  console.error(error);
+  
   if (error instanceof HttpError) {
     return res.status(error.status).json({
       status: error.status,

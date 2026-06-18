@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createUser = exports.getUserByEmail = exports.getUserById = exports.verifyJwt = exports.forgeJwt = void 0;
+const prisma_1 = require("../lib/prisma");
+const forgeJwt = async () => { };
+exports.forgeJwt = forgeJwt;
+const verifyJwt = async () => { };
+exports.verifyJwt = verifyJwt;
+const getUserById = async (id) => await prisma_1.prisma.user.findUnique({ where: { id } });
+exports.getUserById = getUserById;
+const getUserByEmail = async (email) => await prisma_1.prisma.user.findUnique({ where: { email } });
+exports.getUserByEmail = getUserByEmail;
+const createUser = async (data) => await prisma_1.prisma.user.create({ data });
+exports.createUser = createUser;

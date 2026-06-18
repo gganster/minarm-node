@@ -1,9 +1,8 @@
 import {Router} from "express";
 import * as DogController from "../controllers/dogs.controller"
 import {validateBody, validateParams} from "../middlewares/validate";
-import { z } from "zod";
 
-import { dogSchema, type DogInput } from "../schemas/dogs.schema";
+import { dogSchema } from "../schemas/dogs.schema";
 import { idParamsSchema } from "../schemas/utils.schema";
 
 const dogRouter = Router();

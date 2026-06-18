@@ -5,6 +5,7 @@ import { NotFoundError } from "../middlewares/error";
 export const listDogs = async (req: Request, res: Response) => res.json(await DogsService.getDogs())
 
 export const getDog = async (req: Request, res: Response) => {
+  console.log(req.user)
   const id = Number(req.safeParams.id);
   const dog = await DogsService.getDogById(id);
 
