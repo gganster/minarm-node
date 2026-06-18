@@ -1,3 +1,4 @@
+import "./types/express.d.ts";
 import express from "express";
 import fs from "node:fs/promises";
 import { dogRouter } from "./routes/dogs.routes";

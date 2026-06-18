@@ -3,11 +3,20 @@ import { Prisma } from "../../generated/prisma/client";
 import { ZodError } from "zod";
 
 export class HttpError extends Error {
-  constructor(
-    public readonly status: number,
-    message: string,
-  ) {
+  constructor(public readonly status: number, message: string) {
     super(message);
+  }
+}
+
+export class NotFoundError extends HttpError {
+  constructor(message?: string) {
+    super(404, message ?? "not found");
+  }
+}
+
+export class ForbiddenError extends HttpError {
+  constructor(message?: string) {
+    super(403, message ?? "forbidden");
   }
 }
 
