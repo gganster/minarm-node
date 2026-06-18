@@ -1,5 +1,6 @@
 import type {Dog, DogWithoutId} from '../types/dogs.ts';
 import fs from "node:fs/promises";
+import { prisma } from "../lib/prisma";
 
 const FILEPATH = "./dogs.json";
 
@@ -8,15 +9,8 @@ export const getDogs = async () => JSON.parse(await fs.readFile(FILEPATH, "utf-8
 export const getDogById = async (id: string) => (await getDogs()).find(dog => dog.id === id);
 
 export const createDog = async (data: DogWithoutId) => {
-  const newDog: Dog = {
-    id: `${Math.ceil(Math.random() * 1000000)}`,
-    ...data
-  };
-
-  let dogs = await getDogs();
-  dogs = [...dogs, newDog];
-
-  await fs.writeFile(FILEPATH, JSON.stringify(dogs, null, 2), "utf-8");
+  const newDog = await prisma.dog.create({data});
+  console.log(newDog);
   return newDog;
 }
 

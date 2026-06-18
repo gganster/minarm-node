@@ -1,6 +1,6 @@
 
 export type Dog = {
-  id: string;
+  id: number;
   name: string;
   active: boolean;
 };
