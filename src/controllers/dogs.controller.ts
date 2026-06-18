@@ -1,39 +1,51 @@
-import type {Dog, DogWithoutId} from '../types/dogs.ts';
-import fs from "node:fs/promises";
-import { prisma } from "../lib/prisma";
+import * as DogsService from "../services/dogs.service"
+import type { Request, Response } from "express";
+import { dogValidator } from "../types/dogs";
 
-const FILEPATH = "./dogs.json";
+export const listDogs = async (req: Request, res: Response) => res.json(await DogsService.getDogs())
 
-export const getDogs = async () => JSON.parse(await fs.readFile(FILEPATH, "utf-8")) as Dog[];
+export const getDog = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
 
-export const getDogById = async (id: string) => (await getDogs()).find(dog => dog.id === id);
+  if (Number.isNaN(id)) return res.status(400).json({status: 400, message: "non valid id"});
+  const dog = await DogsService.getDogById(id);
 
-export const createDog = async (data: DogWithoutId) => {
-  const newDog = await prisma.dog.create({data});
-  console.log(newDog);
-  return newDog;
+  if (!dog) return res.status(404).json({status: 404, message: "dog not found"});
+  return res.status(200).json(dog);
 }
 
-export const deleteDog = async (id: string) => {
-  let dogs = await getDogs();
-  const dog = dogs.find(dog => dog.id === id);
+export const createDog = async (req: Request, res: Response) => {
+  const dogData = dogValidator(req.body);
 
-  if (!dog) return null;
-  dogs = dogs.filter(dog => dog.id !== id);
-
-  await fs.writeFile(FILEPATH, JSON.stringify(dogs, null, 2), "utf-8");
-  return dog;
+  if (!dogData) return res.status(400).json({ status: 400, message: "Invalid dog data" });
+  const createdDog = await DogsService.createDog(dogData);
+  return res.status(201).json(createdDog);
 }
 
-export const updateDog = async (id: string, data: Partial<DogWithoutId>) => {
-  let dogs = await getDogs();
-  const oldDog = dogs.find(dog => dog.id === id);
+export const updateDog = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const dogData = dogValidator(req.body);
 
-  if (!oldDog) return null;
-  const updatedDog = {...oldDog, ...data};
+  if (Number.isNaN(id)) return res.status(400).json({status: 400, message: "non valid id"});
+  if (!dogData) return res.status(400).json({ status: 400, message: "Invalid dog data" });
 
-  dogs = dogs.map(dog => dog.id === id ? updatedDog : dog);
-  await fs.writeFile(FILEPATH, JSON.stringify(dogs, null, 2), "utf-8");
+  const dog = await DogsService.getDogById(id);
 
-  return updatedDog;
+  if (!dog) return res.status(404).json({status: 404, message: "dog not found"});
+  const updatedDog = await DogsService.updateDog(id, dogData);
+
+  return res.status(200).json(updatedDog)
+}
+
+export const deleteDog = async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+
+  if (Number.isNaN(id)) return res.status(400).json({status: 400, message: "non valid id"});
+  const dog = await DogsService.getDogById(id);
+
+  if (!dog) return res.status(404).json({status: 404, message: "dog not found"});
+  const deletedDog = await DogsService.deleteDog(id);
+
+  return res.status(200).json(deletedDog)
+
 }
