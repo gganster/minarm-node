@@ -37,3 +37,8 @@ export const deleteDog = async (req: Request, res: Response) => {
 
   return res.status(200).json(deletedDog)
 }
+
+export const upload = async (req: Request, res: Response) => {
+  console.log(req.file);
+  res.status(200).send("ok");
+}

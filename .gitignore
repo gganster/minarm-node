@@ -3,3 +3,4 @@ node_modules
 dogs.json
 /generated/prisma
 dev.db
+dist

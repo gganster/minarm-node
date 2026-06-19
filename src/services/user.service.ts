@@ -9,11 +9,11 @@ export interface JwtPayload extends JoseJwtPayload {
 }
 
 export const forgeJwt = (id: number) => (
-  jwt.sign({sub: String(id)}, process.env.JWT_SECRET, {expiresIn: "1h"})
+  jwt.sign({sub: String(id)}, "process.env.JWT_SECRET", {expiresIn: "1h"})
 )
 
 export const verifyJwt = (token: string): JwtPayload => {
-  const payload = jwt.verify(token, process.env.JWT_SECRET);
+  const payload = jwt.verify(token, "process.env.JWT_SECRET");
 
   if (typeof payload === "string") throw new Error("invalid token payload");
   return payload as JwtPayload;

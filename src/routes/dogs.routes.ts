@@ -4,6 +4,7 @@ import {validateBody, validateParams} from "../middlewares/validate";
 
 import { dogSchema } from "../schemas/dogs.schema";
 import { idParamsSchema } from "../schemas/utils.schema";
+import { upload } from "../middlewares/upload";
 
 const dogRouter = Router();
 
@@ -35,6 +36,12 @@ dogRouter.put(
   validateParams(idParamsSchema), 
   validateBody(dogSchema), 
   DogController.updateDog
+);
+
+dogRouter.post(
+  "/:id/upload",
+  upload.single("attachment"),
+  DogController.upload
 );
 
 export {dogRouter}
