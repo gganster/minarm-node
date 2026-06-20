@@ -1,0 +1,76 @@
+name: taskapi-ts-prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskapi-ts-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-taskapi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit être défini (voir .env)}
+      POSTGRES_DB: ${POSTGRES_DB:-taskapi}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taskapi} -d ${POSTGRES_DB:-taskapi}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taskapi-ts-app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_PROVIDER: postgresql
+      DATABASE_URL: postgres://${POSTGRES_USER:-taskapi}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-taskapi}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET doit être défini (voir .env)}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-10}
+      UPLOAD_MAX_SIZE: ${UPLOAD_MAX_SIZE:-5242880}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-10}
+    expose:
+      - "3000"
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: taskapi-ts-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  uploads_data:

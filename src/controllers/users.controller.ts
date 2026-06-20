@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import * as UserService from "../services/user.service";
 import bcrypt from "bcrypt";
 import { ForbiddenError, HttpError } from "../middlewares/error";
+import { env } from "../config/env";
 
 export const signup = async (req: Request, res: Response) => {
   //check if email exists
@@ -11,7 +12,7 @@ export const signup = async (req: Request, res: Response) => {
 
   const {password, ...newUser} = await UserService.createUser({
     ...req.body,
-    password: await bcrypt.hash(req.body.password, 5)
+    password: await bcrypt.hash(req.body.password, env.BCRYPT_ROUNDS)
   });
 
   return res.status(201).json({

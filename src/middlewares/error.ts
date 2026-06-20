@@ -1,5 +1,5 @@
 import type { ErrorRequestHandler } from "express";
-import { Prisma } from "../../generated/prisma/client";
+import { Prisma } from "../generated/prisma/client";
 import { ZodError } from "zod";
 
 export class HttpError extends Error {

@@ -3,12 +3,13 @@ import { HttpError } from "./error";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { env } from "../config/env";
 
-fs.mkdirSync("upload/", {recursive: true});
+fs.mkdirSync("uploads/", {recursive: true});
 
 export const upload = multer({
   storage: multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, "upload/"),
+    destination: (_req, _file, cb) => cb(null, "uploads/"),
     filename: (_req, file, cb) => {
       const ext = path.extname(file.originalname).toLowerCase();
       cb(null, `${crypto.randomBytes(8).toString("hex")}${ext}`)
@@ -22,5 +23,5 @@ export const upload = multer({
 
     cb(err);
   },
-  limits: {fileSize: 10 * 1024 * 1024, files: 1}
+  limits: {fileSize: env.UPLOAD_MAX_SIZE, files: 1}
 })

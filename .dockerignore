@@ -1,0 +1,14 @@
+node_modules
+dist
+src/generated
+*.db
+.env
+.env.*
+!.env.template
+.git
+.gitignore
+.vscode
+npm-debug.log*
+Dockerfile
+docker-compose.yml
+.dockerignore

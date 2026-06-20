@@ -4,11 +4,16 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  // Le projet est en CommonJS ("type": "commonjs") : on force le client en CJS
+  // pour qu'il compile avec tsc et tourne sous `node dist/...`.
+  moduleFormat = "cjs"
 }
 
 datasource db {
+  // provider synchronisé avec DATABASE_PROVIDER par `prisma/set-provider.mjs`
+  // (défaut commité : sqlite pour le dev). Lancé via les scripts npm prisma:*.
   provider = "sqlite"
 }
 

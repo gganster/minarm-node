@@ -1,6 +1,6 @@
 .env
 node_modules
 dogs.json
-/generated/prisma
+/src/generated/prisma
 dev.db
 dist
