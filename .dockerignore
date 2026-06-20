@@ -10,5 +10,5 @@ src/generated
 .vscode
 npm-debug.log*
 Dockerfile
-docker-compose.yml
+docker-compose*.yml
 .dockerignore

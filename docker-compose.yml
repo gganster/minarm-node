@@ -1,20 +1,20 @@
-name: taskapi-ts-prod
+name: dogapi-ts-prod
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: taskapi-ts-postgres
+    container_name: dogapi-ts-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-taskapi}
+      POSTGRES_USER: ${POSTGRES_USER:-dogapi}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit être défini (voir .env)}
-      POSTGRES_DB: ${POSTGRES_DB:-taskapi}
+      POSTGRES_DB: ${POSTGRES_DB:-dogapi}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-taskapi} -d ${POSTGRES_DB:-taskapi}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dogapi} -d ${POSTGRES_DB:-dogapi}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,12 +23,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: taskapi-ts-app
+    container_name: dogapi-ts-app
     restart: unless-stopped
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: postgres://${POSTGRES_USER:-taskapi}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-taskapi}
+      DATABASE_URL: postgres://${POSTGRES_USER:-dogapi}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dogapi}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET doit être défini (voir .env)}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
       BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-10}
@@ -55,7 +55,7 @@ services:
 
   nginx:
     image: nginx:1.27-alpine
-    container_name: taskapi-ts-nginx
+    container_name: dogapi-ts-nginx
     restart: unless-stopped
     ports:
       - "${NGINX_PORT:-80}:80"

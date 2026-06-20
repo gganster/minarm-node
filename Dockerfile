@@ -20,9 +20,14 @@ COPY src ./src
 RUN npm run prisma:generate
 RUN npm run build
 
+# Élague les devDeps (tsx, typescript, eslint…) : ne reste en node_modules que
+# les deps de prod, dont le CLI `prisma` (déplacé en dependencies) requis par
+# `migrate deploy` au démarrage. Réduit la taille et la surface d'attaque.
+RUN npm prune --omit=dev
+
 # ============================================================
 # Étape 2 — runtime : image finale exécutée par un utilisateur non-root.
-# On conserve le CLI Prisma (node_modules) pour appliquer les migrations
+# On conserve le CLI Prisma (node_modules de prod) pour appliquer les migrations
 # versionnées au démarrage via `prisma migrate deploy`.
 # ============================================================
 FROM node:22-alpine AS runtime

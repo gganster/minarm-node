@@ -40,6 +40,7 @@ dogRouter.put(
 
 dogRouter.post(
   "/:id/upload",
+  validateParams(idParamsSchema),
   upload.single("attachment"),
   DogController.upload
 );

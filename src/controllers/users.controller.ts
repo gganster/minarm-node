@@ -10,7 +10,7 @@ export const signup = async (req: RequestWithBody<SignupInput>, res: Response) =
   //check if email exists
   const user = await UserService.getUserByEmail(req.body.email);
 
-  if (user) throw new HttpError(429, "User already exists");
+  if (user) throw new HttpError(409, "User already exists");
 
   const {password, ...newUser} = await UserService.createUser({
     ...req.body,

@@ -1,27 +1,33 @@
 import multer from "multer"
 import { HttpError } from "./error";
 import fs from "node:fs";
-import path from "node:path";
 import crypto from "node:crypto";
 import { env } from "../config/env";
 
 fs.mkdirSync("uploads/", {recursive: true});
 
+// Source de vérité unique : mimetypes autorisés -> extension stockée.
+// L'extension est dérivée du mimetype validé (et NON du nom fourni par le
+// client), pour qu'un "evil.html" déguisé en image/png ne soit pas stocké en
+// .html puis re-servi en text/html par express.static (XSS stocké).
+const MIME_TO_EXT: Record<string, string> = {
+  "image/png": ".png",
+  "image/jpeg": ".jpg",
+  "image/gif": ".gif",
+  "application/pdf": ".pdf",
+};
+
 export const upload = multer({
   storage: multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, "uploads/"),
     filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname).toLowerCase();
+      const ext = MIME_TO_EXT[file.mimetype] ?? "";
       cb(null, `${crypto.randomBytes(8).toString("hex")}${ext}`)
     }
   }),
   fileFilter: (_req, file, cb) => {
-    const ALLOWED_MIME = new Set(['image/png', 'image/jpeg', 'image/gif', 'application/pdf']);
-
-    if (ALLOWED_MIME.has(file.mimetype)) return cb(null, true);
-    const err = new HttpError(400, "Type non autorisé");
-
-    cb(err);
+    if (file.mimetype in MIME_TO_EXT) return cb(null, true);
+    cb(new HttpError(400, "Type non autorisé"));
   },
   limits: {fileSize: env.UPLOAD_MAX_SIZE, files: 1}
 })

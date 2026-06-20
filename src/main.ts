@@ -10,6 +10,12 @@ import { env } from "./config/env";
 
 const app = express();
 
+// Derrière nginx (prod) : faire confiance au 1er proxy pour que `req.ip` soit
+// l'IP réelle du client. Indispensable au rate-limiting per-IP (sinon tout le
+// trafic est compté sous l'IP du conteneur nginx). La conf nginx ÉCRASE
+// X-Forwarded-For avec $remote_addr, ce qui empêche le spoofing de l'en-tête.
+app.set("trust proxy", 1);
+
 // CORS en tout premier : les en-têtes CORS doivent être posés sur TOUTES les
 // réponses (y compris les 429 du rate-limiter) et les préflights OPTIONS doivent
 // être court-circuités avant de consommer le quota de rate-limiting.
