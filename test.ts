@@ -6,4 +6,4 @@ type B = {
   ids: string
 }
 
-let v: A = {id: "b"} as B
+const v: A = {id: "b"} as B
