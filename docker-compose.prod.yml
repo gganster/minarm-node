@@ -28,11 +28,11 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_PROVIDER: postgresql
       DATABASE_URL: postgres://${POSTGRES_USER:-taskapi}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-taskapi}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET doit être défini (voir .env)}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
       BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-10}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
       UPLOAD_MAX_SIZE: ${UPLOAD_MAX_SIZE:-5242880}
       RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
       RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-100}

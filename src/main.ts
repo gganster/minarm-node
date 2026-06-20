@@ -10,6 +10,13 @@ import { env } from "./config/env";
 
 const app = express();
 
+// CORS en tout premier : les en-têtes CORS doivent être posés sur TOUTES les
+// réponses (y compris les 429 du rate-limiter) et les préflights OPTIONS doivent
+// être court-circuités avant de consommer le quota de rate-limiting.
+// CORS_ORIGIN accepte une ou plusieurs origines séparées par des virgules.
+const corsOrigins = env.CORS_ORIGIN.split(",").map((o) => o.trim());
+app.use(cors({ origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins }));
+
 const limiter = rateLimit({
     windowMs: env.RATE_LIMIT_WINDOW_MS,
     limit: env.RATE_LIMIT_MAX,
@@ -29,7 +36,6 @@ const authLimiter = rateLimit({
     message: { error: 'Trop de tentatives, réessayez plus tard' },
 })
 
-app.use(cors({origin: "http://localhost"}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(logguer);

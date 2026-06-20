@@ -11,5 +11,5 @@ export function auth(req: Request, res: Response, next: NextFunction): void {
     const payload = UserService.verifyJwt(token);
     req.user = {id: Number(payload.sub)};
     next();
-  } catch (e) {throw new ForbiddenError("invalid token")}
+  } catch {throw new ForbiddenError("invalid token")}
 }

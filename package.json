@@ -11,17 +11,15 @@
     "lint:fix": "eslint . --fix",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "db:provider": "node prisma/set-provider.mjs",
-    "prisma:generate": "node prisma/set-provider.mjs && prisma generate",
-    "prisma:migrate": "node prisma/set-provider.mjs && prisma migrate dev",
-    "prisma:deploy": "node prisma/set-provider.mjs && prisma migrate deploy"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@t3-oss/env-core": "^0.13.11",
@@ -38,7 +36,6 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/bcrypt": "^6.0.0",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",

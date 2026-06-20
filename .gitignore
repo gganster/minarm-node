@@ -4,3 +4,4 @@ dogs.json
 /src/generated/prisma
 dev.db
 dist
+uploads

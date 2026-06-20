@@ -12,9 +12,7 @@ generator client {
 }
 
 datasource db {
-  // provider synchronisé avec DATABASE_PROVIDER par `prisma/set-provider.mjs`
-  // (défaut commité : sqlite pour le dev). Lancé via les scripts npm prisma:*.
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model Dog {

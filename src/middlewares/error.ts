@@ -20,7 +20,7 @@ export class ForbiddenError extends HttpError {
   }
 }
 
-export const errorMiddleware: ErrorRequestHandler = (error, req, res, next) => {
+export const errorMiddleware: ErrorRequestHandler = (error, req, res, _next) => {
   console.error(error);
   
   if (error instanceof HttpError) {
