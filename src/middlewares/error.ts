@@ -2,6 +2,7 @@ import type { ErrorRequestHandler, Response } from "express";
 import { MulterError } from "multer";
 import { Prisma } from "../generated/prisma/client";
 import { ZodError } from "zod";
+import { env } from "../config/env";
 
 export class HttpError extends Error {
   constructor(public readonly status: number, message: string) {
@@ -25,9 +26,14 @@ export class ForbiddenError extends HttpError {
 // erreurs client attendues (mauvais login, 404, validation) : les passer en
 // `error` noierait les vrais incidents et amplifierait le bruit sous brute-force.
 const logError = (error: unknown, status: number): void => {
+  // 5xx = vrais incidents serveur : toujours loggés (y compris en test, pour
+  // ne pas masquer un échec inattendu). 4xx = erreurs client attendues : en
+  // `info` hors test (silencieux pendant les tests pour garder la sortie lisible).
   if (status >= 500) {
     console.error(error);
-  } else {
+    return;
+  }
+  if (env.NODE_ENV !== "test") {
     console.info(`${status} ${error instanceof Error ? error.message : String(error)}`);
   }
 };

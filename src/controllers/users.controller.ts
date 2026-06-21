@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import type { RequestWithBody } from "../types/http";
-import type { LoginInput, SignupInput } from "../schemas/user.schema";
-import * as UserService from "../services/user.service";
+import type { LoginInput, SignupInput } from "../schemas/users.schema";
+import * as UserService from "../services/users.service";
 import bcrypt from "bcrypt";
 import { ForbiddenError, HttpError } from "../middlewares/error";
 import { env } from "../config/env";

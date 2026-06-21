@@ -90,18 +90,20 @@ HTTP → [nginx] → routes → validation (Zod) → controller → service → 
 
 ```
 src/
-├── main.ts              # bootstrap Express : middlewares globaux + montage des routes
+├── main.ts              # point d'entrée : démarre le serveur HTTP (app.listen)
+├── app.ts               # assemblage Express (middlewares + routes), exporté pour les tests
 ├── config/env.ts        # configuration validée au démarrage (@t3-oss/env-core + Zod)
 ├── lib/prisma.ts        # client Prisma (adapter PostgreSQL) — singleton
 ├── routes/              # dogs.routes.ts, users.routes.ts
 ├── controllers/         # dogs.controller.ts, users.controller.ts
-├── services/            # dogs.service.ts, user.service.ts
-├── schemas/             # dog / user / utils (Zod)
+├── services/            # dogs.service.ts, users.service.ts
+├── schemas/             # dogs / users / utils (Zod)
 ├── middlewares/         # auth, validate, error, upload, logguer
 ├── types/               # http.ts (RequestWithBody), express.d.ts (augmentation Request)
 └── generated/prisma/    # client Prisma généré (git-ignoré)
 prisma/                  # schema.prisma + migrations (PostgreSQL)
 nginx/                   # configuration du reverse proxy (prod)
+tests/                   # suite d'intégration (node:test via tsx) — npm test
 ```
 
 ### Conventions clés

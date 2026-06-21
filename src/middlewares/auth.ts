@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { ForbiddenError } from "./error";
-import * as UserService from "../services/user.service";
+import * as UserService from "../services/users.service";
 
 // Récupère l'id de l'utilisateur authentifié (posé par `auth` sur les routes
 // protégées). Garde-fou runtime : si `req.user` est absent (route montée sans
@@ -11,7 +11,7 @@ export const requireUserId = (req: Request): number => {
   return req.user.id;
 };
 
-export function auth(req: Request, res: Response, next: NextFunction): void {
+export function auth(req: Request, _res: Response, next: NextFunction): void {
   const token = req.headers.authorization;
 
   if (!token) throw new ForbiddenError;

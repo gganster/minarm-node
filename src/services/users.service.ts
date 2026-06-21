@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma";
-import { SignupInput } from "../schemas/user.schema";
+import { SignupInput } from "../schemas/users.schema";
 import jwt, { type JwtPayload as JoseJwtPayload, type SignOptions } from "jsonwebtoken";
 import { env } from "../config/env";
 

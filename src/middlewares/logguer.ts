@@ -1,6 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
+import { env } from "../config/env";
 
 export function logguer(req: Request, res: Response, next: NextFunction): void {
+  // En test, on ne journalise pas chaque requête (sortie du runner lisible).
+  if (env.NODE_ENV === "test") return next();
+
   const startedAt = process.hrtime.bigint();
 
   res.on("finish", () => {

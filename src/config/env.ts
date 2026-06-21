@@ -2,10 +2,15 @@ import dotenv from "dotenv";
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export const env = createEnv({
   server: {
+    // Environnement d'exécution. Pilote notamment la verbosité des logs (les
+    // requêtes et erreurs ne sont pas journalisées en `test` -> sortie du runner
+    // lisible). `production` est posé par docker-compose / Dockerfile.
+    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+
     // URL de connexion PostgreSQL (postgres:// ou postgresql://). Pas de défaut :
     // la config est explicite (.env en dev, docker-compose en prod).
     DATABASE_URL: z

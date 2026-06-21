@@ -73,4 +73,12 @@ export default tseslint.config(
       "@typescript-eslint/require-await": "warn",
     },
   },
+  {
+    // Tests d'intégration (hors tsconfig applicatif, exécutés via tsx) : on
+    // tolère `any` pour les corps de réponse JSON dynamiques.
+    files: ["tests/**/*.{ts,mts,cts}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
 );
