@@ -43,14 +43,15 @@ L'API écoute sur `http://localhost:3000` (variable `PORT`). Vérifier : `GET ht
 | Commande | Rôle |
 |---|---|
 | `npm run dev` | Serveur en watch (tsx) |
-| `npm run build` | Compilation TypeScript → `dist/` |
+| `npm run build` | Compilation `tsc` → `dist/`, puis `tsc-alias` (réécrit les alias `@/`) |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` / `lint:fix` | ESLint |
+| `npm test` | Tests d'intégration (`node:test` via tsx, base de dev requise) |
 | `npm run prisma:migrate` | Crée/applique une migration (dev, DB requise) |
 | `npm run prisma:deploy` | Applique les migrations existantes (CI/prod) |
 | `npm run prisma:generate` | Régénère le client Prisma |
 
-> Il n'y a pas encore de suite de tests (`npm test` est un placeholder).
+> Les tests d'intégration sont dans `tests/` (`node:test` via tsx, zéro dépendance ajoutée). `npm test` applique les migrations (`pretest`) puis lance la suite contre la base de dev (qui doit tourner) : chaque fichier monte l'app exportée (`src/app.ts`) sur un port éphémère et la pilote via `fetch`. Couvre toutes les routes (auth, CRUD, IDOR, upload/413, rate-limit/429, en-têtes de sécurité).
 
 ### Production (Docker)
 
@@ -80,7 +81,8 @@ HTTP → [nginx] → routes → validation (Zod) → controller → service → 
                                               (throw) → errorMiddleware
 ```
 
-- **nginx** (prod uniquement) : seul point d'entrée exposé, reverse proxy + en-têtes de sécurité + rate-limiting réseau + limite de taille des corps.
+- **nginx** (prod uniquement) : seul point d'entrée exposé, reverse proxy + rate-limiting réseau + limite de taille des corps. Les en-têtes de sécurité sont posés par l'app (`helmet`) ; nginx ne conserve que `nosniff` pour ses propres réponses d'erreur.
+- **middlewares globaux** (`src/app.ts`, dans l'ordre) : `cors` → `helmet` (en-têtes de sécurité) → `rateLimit` → parsers `urlencoded`/`json` → `morgan` (logs HTTP) → routes → `errorMiddleware` (en dernier).
 - **routes** (`src/routes/`) : déclarent les endpoints et branchent les middlewares (validation, `auth`, rate-limit) avant chaque controller.
 - **controllers** (`src/controllers/`) : fins — orchestrent la réponse HTTP et **lèvent** des erreurs ; ne construisent jamais eux-mêmes les réponses d'erreur.
 - **services** (`src/services/`) : logique métier et **tout** l'accès Prisma (via le singleton `src/lib/prisma.ts`).
@@ -108,11 +110,13 @@ tests/                   # suite d'intégration (node:test via tsx) — npm test
 
 ### Conventions clés
 
-- **Gestion d'erreurs centralisée** : on **lève** `HttpError` / `NotFoundError` / `ForbiddenError` (`src/middlewares/error.ts`). Express 5 propage les rejets async vers `errorMiddleware`, qui mappe : `HttpError` → son statut, `ZodError` → 400, Prisma `P2002` → 409, `P2025` → 404, sinon 500.
-- **Validation = réécriture de la requête** : `validateBody(schema)` remplace `req.body` par la valeur parsée ; `validateParams(schema)` écrit dans **`req.safeParams`** (et non `req.params`). Les controllers lisent `Number(req.safeParams.id)`.
+- **Gestion d'erreurs centralisée** : on **lève** `HttpError` / `NotFoundError` / `ForbiddenError` (`src/middlewares/error.ts`). Express 5 propage les rejets async vers `errorMiddleware`, qui mappe : `HttpError` → son statut, `ZodError` → 400, `MulterError` → 413/400, Prisma `P2002` → 409, `P2025` → 404, sinon 500. Toutes les réponses d'erreur partagent la forme `{ status, message }` ; seules les 5xx sont loggées (rien en `NODE_ENV=test`).
+- **Validation = réécriture de la requête** : `validateBody(schema)` remplace `req.body` par la valeur parsée ; `validateParams(schema)` écrit dans **`req.safeParams`**. Les controllers lisent l'id validé via `requireParamId(req)` (`src/middlewares/validate.ts`), qui renvoie 400 si `validateParams` n'a pas été branché.
 - **Typage du corps** : convention manuelle `req: RequestWithBody<T>` (`src/types/http.ts`), à garder synchronisée avec le `validateBody(schema)` de la route.
+- **Alias d'import `@/*` → `src/*`** : importer via `@/...` (ex. `@/config/env`) plutôt que `../` ; résolu nativement par `tsx`/`tsc` et réécrit en chemins relatifs au build par `tsc-alias` (le `dist/` ne contient aucun alias). Les imports voisins restent en `./`.
+- **Sécurité & journalisation** : `helmet` pose les en-têtes de sécurité et retire `X-Powered-By` (CSP désactivée — API JSON/fichiers) ; `morgan` journalise les requêtes (`dev` en dev, `combined` en prod, muet en test).
 - **Configuration** : tout passe par `src/config/env.ts` (validé au boot, le process échoue si l'env est invalide). Lire les réglages via `env` plutôt que `process.env`.
-- **Authentification** : le middleware `auth` lit le header `Authorization` **brut** (sans préfixe `Bearer`) et le vérifie en HS256 ; il pose `req.user = { id }`. Les routes `/dogs` et `/upload` sont protégées ; `/auth` a un rate-limiter plus strict.
+- **Authentification** : le middleware `auth` lit le header `Authorization` **brut** (sans préfixe `Bearer`) et le vérifie en HS256 ; il pose `req.user = { id }`. Les routes `/dogs` (upload inclus) sont protégées ; `/auth` a un rate-limiter plus strict.
 
 ### Surface de l'API
 
@@ -133,5 +137,5 @@ tests/                   # suite d'intégration (node:test via tsx) — npm test
 ### Base de données & déploiement
 
 - **PostgreSQL uniquement** : `src/lib/prisma.ts` utilise le driver adapter `@prisma/adapter-pg` ; les migrations versionnées sont en dialecte Postgres (`prisma/migrations/`, baseline `0_init`).
-- **Image Docker multi-étapes** (`Dockerfile`) : build (deps natives + `prisma generate` + `tsc`) puis runtime minimal exécuté en utilisateur non-root, avec `HEALTHCHECK`.
+- **Image Docker multi-étapes** (`Dockerfile`) : build (deps natives + `prisma generate` + `tsc && tsc-alias`) puis runtime minimal exécuté en utilisateur non-root, avec `HEALTHCHECK`.
 - **`docker-compose.yml`** (prod) orchestre `postgres` + `app` + `nginx` ; **`docker-compose.dev.yml`** ne lance que `postgres` pour le développement local.

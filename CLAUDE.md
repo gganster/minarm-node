@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-REST API (Express 5 + TypeScript + Prisma 7 / PostgreSQL) exposing a `Dog` resource plus JWT auth (`User`) and file upload. CommonJS project run with `tsx` in dev and compiled with `tsc` for prod.
+REST API (Express 5 + TypeScript + Prisma 7 / PostgreSQL) exposing a `Dog` resource plus JWT auth (`User`) and file upload. Hardened with `helmet` (security headers) and `morgan` (request logging). CommonJS project run with `tsx` in dev and compiled with `tsc` + `tsc-alias` for prod.
 
 ## Commands
 
@@ -21,16 +21,16 @@ npm run prisma:deploy    # prisma migrate deploy (CI/prod)
 
 - **Integration tests** live in `tests/` (`*.test.ts`, Node's built-in `node:test` run via `tsx`). `npm test` runs `prisma migrate deploy` (pretest) then the suite against the **dev Postgres** (must be up). `tests/setup.mjs` is preloaded (`--import`) to set `NODE_ENV=test` and raise rate limits; each file boots the exported `app` (`src/app.ts`) on an ephemeral port and drives it with `fetch`.
 - **The Prisma client is git-ignored and must be generated** (`npm run prisma:generate`) before `typecheck`/`build`/running, otherwise imports from `src/generated/prisma` break.
-- **Local dev DB**: `docker compose -f docker-compose.dev.yml up -d` (Postgres on `localhost:5432`). Then `cp .env.template .env`.
+- **Local dev DB**: `docker compose -f docker-compose.dev.yml up -d` (Postgres on host port `localhost:5432`). Then `cp .env.template .env`.
 - **Prod stack**: `docker compose up -d --build` (postgres + app + nginx). The `app` container runs `prisma migrate deploy` on boot before starting the API (see `Dockerfile` CMD).
 
 ## Request flow & layering
 
 `routes → validation middleware → controller → service → prisma`
 
-- **Routes** (`src/routes/`) wire Zod validation middleware before each controller. Auth-protected groups mount the `auth` middleware (`/dogs`, `/upload`); `/auth` gets a stricter `authLimiter`.
+- **Routes** (`src/routes/`) wire Zod validation middleware before each controller. The `/dogs` group (including its upload routes) mounts the `auth` middleware; `/auth` gets a stricter `authLimiter`.
 - **Controllers** (`src/controllers/`) are thin: orchestrate the HTTP response and **throw** on errors — they never build error responses themselves.
-- **Services** (`src/services/`) hold all Prisma access and domain logic. Import the shared singleton `prisma` from `src/lib/prisma.ts`.
+- **Services** (`src/services/`) hold all Prisma access and domain logic. Import the shared singleton `prisma` via `@/lib/prisma` (`src/lib/prisma.ts`).
 - **Schemas** (`src/schemas/`) are the source of truth for input types via `z.infer` (e.g. `DogInput`, `SignupInput`).
 
 ## Key conventions (non-obvious)

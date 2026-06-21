@@ -4,9 +4,9 @@ name: dogapi-ts-dev
 # Base PostgreSQL pour le développement local.
 #   docker compose -f docker-compose.dev.yml up -d
 # L'app tourne en local (`npm run dev`) et se connecte via DATABASE_URL
-# (défaut : postgres://dogapi:dogapi@localhost:5433/dogapi — voir .env).
-# Port hôte 5433 (et non 5432) pour éviter tout conflit avec un PostgreSQL
-# natif déjà à l'écoute sur 5432. Identifiants faibles : usage dev uniquement.
+# (défaut : postgres://dogapi:dogapi@localhost:5432/dogapi — voir .env).
+# Port hôte 5432 (port PostgreSQL standard) : vérifier qu'aucun PostgreSQL natif
+# n'écoute déjà dessus, sinon adapter le mapping. Identifiants faibles : usage dev uniquement.
 # ============================================================
 
 services:
@@ -19,7 +19,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dogapi}
       POSTGRES_DB: ${POSTGRES_DB:-dogapi}
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
     healthcheck:
