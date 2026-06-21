@@ -2,8 +2,8 @@ import multer from "multer"
 import { HttpError } from "./error";
 import fs from "node:fs";
 import crypto from "node:crypto";
-import { env } from "../config/env";
-import { UPLOADS_DIR } from "../lib/uploads";
+import { env } from "@/config/env";
+import { UPLOADS_DIR } from "@/lib/uploads";
 
 fs.mkdirSync(UPLOADS_DIR, {recursive: true});
 

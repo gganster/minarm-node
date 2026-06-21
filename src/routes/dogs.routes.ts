@@ -1,10 +1,10 @@
 import {Router} from "express";
-import * as DogController from "../controllers/dogs.controller"
-import {validateBody, validateParams} from "../middlewares/validate";
+import * as DogController from "@/controllers/dogs.controller"
+import {validateBody, validateParams} from "@/middlewares/validate";
 
-import { dogSchema } from "../schemas/dogs.schema";
-import { idParamsSchema } from "../schemas/utils.schema";
-import { upload } from "../middlewares/upload";
+import { dogSchema } from "@/schemas/dogs.schema";
+import { idParamsSchema } from "@/schemas/utils.schema";
+import { upload } from "@/middlewares/upload";
 
 const dogRouter = Router();
 

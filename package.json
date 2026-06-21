@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "pretest": "prisma migrate deploy",
     "test": "tsx --test --import ./tests/setup.mjs \"tests/**/*.test.ts\"",
     "prisma:generate": "prisma generate",
@@ -50,6 +50,7 @@
     "eslint": "^10.5.0",
     "globals": "^17.6.0",
     "nodemon": "^3.1.14",
+    "tsc-alias": "^1.8.17",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.61.1"

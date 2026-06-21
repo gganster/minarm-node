@@ -1,8 +1,8 @@
 import type { ErrorRequestHandler, Response } from "express";
 import { MulterError } from "multer";
-import { Prisma } from "../generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { ZodError } from "zod";
-import { env } from "../config/env";
+import { env } from "@/config/env";
 
 export class HttpError extends Error {
   constructor(public readonly status: number, message: string) {

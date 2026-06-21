@@ -1,13 +1,13 @@
 import express from "express";
-import { dogRouter } from "./routes/dogs.routes";
-import {userRouter} from "./routes/users.routes.js";
-import { errorMiddleware } from "./middlewares/error";
+import { dogRouter } from "@/routes/dogs.routes";
+import {userRouter} from "@/routes/users.routes.js";
+import { errorMiddleware } from "@/middlewares/error";
 import { rateLimit } from 'express-rate-limit'
-import {auth} from "./middlewares/auth.js";
+import {auth} from "@/middlewares/auth.js";
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
-import { env } from "./config/env";
+import { env } from "@/config/env";
 
 // Construction de l'app Express SANS `listen` : exportée pour que la suite de
 // tests d'intégration (tests/) puisse la monter sur un port éphémère. Le

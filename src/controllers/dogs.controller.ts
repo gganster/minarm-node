@@ -1,11 +1,11 @@
-import * as DogsService from "../services/dogs.service"
+import * as DogsService from "@/services/dogs.service"
 import type { Request, Response, NextFunction } from "express";
-import type { RequestWithBody } from "../types/http";
-import type { DogInput } from "../schemas/dogs.schema";
-import { HttpError, NotFoundError } from "../middlewares/error";
-import { requireUserId } from "../middlewares/auth";
-import { requireParamId } from "../middlewares/validate";
-import { UPLOADS_DIR } from "../lib/uploads";
+import type { RequestWithBody } from "@/types/http";
+import type { DogInput } from "@/schemas/dogs.schema";
+import { HttpError, NotFoundError } from "@/middlewares/error";
+import { requireUserId } from "@/middlewares/auth";
+import { requireParamId } from "@/middlewares/validate";
+import { UPLOADS_DIR } from "@/lib/uploads";
 import fs from "node:fs";
 import path from "node:path";
 

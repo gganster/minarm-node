@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { startClient, signup, teardown, type Client } from "./helpers";
-import { UPLOADS_DIR } from "../src/lib/uploads";
+import { UPLOADS_DIR } from "@/lib/uploads";
 
 let c: Client;
 const uploaded: string[] = []; // fichiers écrits sur disque, supprimés en fin de fichier

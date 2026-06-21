@@ -1,7 +1,7 @@
-import { prisma } from "../lib/prisma";
-import { SignupInput } from "../schemas/users.schema";
+import { prisma } from "@/lib/prisma";
+import { SignupInput } from "@/schemas/users.schema";
 import jwt, { type JwtPayload as JoseJwtPayload, type SignOptions } from "jsonwebtoken";
-import { env } from "../config/env";
+import { env } from "@/config/env";
 
 // `sub` suit la norme JWT (RFC 7519) : une chaîne. L'id numérique est
 // converti via String(id) à la signature, et Number(payload.sub) à la lecture.

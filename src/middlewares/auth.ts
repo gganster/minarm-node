@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { ForbiddenError } from "./error";
-import * as UserService from "../services/users.service";
+import * as UserService from "@/services/users.service";
 
 // Récupère l'id de l'utilisateur authentifié (posé par `auth` sur les routes
 // protégées). Garde-fou runtime : si `req.user` est absent (route montée sans

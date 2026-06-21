@@ -1,5 +1,5 @@
-import { prisma } from "../lib/prisma";
-import type { DogInput } from '../schemas/dogs.schema.ts';
+import { prisma } from "@/lib/prisma";
+import type { DogInput } from '@/schemas/dogs.schema';
 
 // Toutes les lectures sont scoppées au propriétaire : un utilisateur ne voit
 // (et ne peut donc cibler) que ses propres chiens. `getDogById` renvoie null

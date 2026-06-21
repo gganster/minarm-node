@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
-import type { RequestWithBody } from "../types/http";
-import type { LoginInput, SignupInput } from "../schemas/users.schema";
-import * as UserService from "../services/users.service";
+import type { RequestWithBody } from "@/types/http";
+import type { LoginInput, SignupInput } from "@/schemas/users.schema";
+import * as UserService from "@/services/users.service";
 import bcrypt from "bcrypt";
-import { ForbiddenError, HttpError } from "../middlewares/error";
-import { env } from "../config/env";
+import { ForbiddenError, HttpError } from "@/middlewares/error";
+import { env } from "@/config/env";
 
 // Hash bcrypt précalculé au chargement (même cost que la prod) comparé lorsque
 // l'email est inconnu : le chemin "utilisateur introuvable" dépense alors le même

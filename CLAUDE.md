@@ -9,7 +9,7 @@ REST API (Express 5 + TypeScript + Prisma 7 / PostgreSQL) exposing a `Dog` resou
 ```bash
 npm run dev            # tsx watch (hot reload) — src/main.ts
 npm start              # tsx without watch
-npm run build          # tsc -> dist/
+npm run build          # tsc -> dist/, puis tsc-alias réécrit les alias @/ en chemins relatifs
 npm run typecheck      # tsc --noEmit
 npm run lint           # eslint .   (lint:fix to autofix)
 npm test               # integration tests (node:test via tsx) — needs the dev DB up
@@ -40,6 +40,7 @@ npm run prisma:deploy    # prisma migrate deploy (CI/prod)
 - **Typed request bodies are a manual convention.** Controllers annotate `req: RequestWithBody<T>` (`src/types/http.ts`) where `T` is the Zod-inferred type; this is not inferred from the route, so keep the route's `validateBody(schema)` and the controller's `RequestWithBody<schemaType>` in sync.
 - **`Request` is globally augmented** in `src/types/express.d.ts` (`req.user`, `req.safeParams`) — picked up via tsconfig `include`, no explicit import needed.
 - **Auth token is the raw `Authorization` header** — `auth` middleware passes `req.headers.authorization` straight to `verifyJwt` (no `Bearer ` stripping). JWT `sub` is `String(id)`, read back as `Number(payload.sub)`; HS256 is pinned on sign and verify.
+- **Path alias `@/*` → `src/*`.** Import cross-directory modules via `@/...` (e.g. `import { env } from "@/config/env"`), not `../`. Resolved by `tsx` (dev/test) and `tsc` (typecheck/`paths`); the prod build runs `tsc && tsc-alias` so emitted `dist/` JS has plain relative `require`s (`node dist/main.js` needs no path hook). Same-directory imports stay `./sibling`. Removing `tsc-alias` from `build` would ship `@/` requires that plain Node can't resolve.
 - **All configuration goes through `src/config/env.ts`** (@t3-oss/env-core + Zod, validated at startup — the process throws on invalid env). Read tunables from the exported `env` (rate limits, `BCRYPT_ROUNDS`, `UPLOAD_MAX_SIZE`, `CORS_ORIGIN`, JWT settings); never read `process.env` directly in app code.
 
 ## Database
