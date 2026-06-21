@@ -98,7 +98,7 @@ src/
 ├── controllers/         # dogs.controller.ts, users.controller.ts
 ├── services/            # dogs.service.ts, users.service.ts
 ├── schemas/             # dogs / users / utils (Zod)
-├── middlewares/         # auth, validate, error, upload, logguer
+├── middlewares/         # auth, validate, error, upload
 ├── types/               # http.ts (RequestWithBody), express.d.ts (augmentation Request)
 └── generated/prisma/    # client Prisma généré (git-ignoré)
 prisma/                  # schema.prisma + migrations (PostgreSQL)

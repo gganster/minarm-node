@@ -52,7 +52,7 @@ npm run prisma:deploy    # prisma migrate deploy (CI/prod)
 
 `src/app.ts` builds and **exports** the Express `app` (no `listen`) so the test suite can mount it on an ephemeral port; `src/main.ts` only imports it and calls `app.listen`.
 
-Order: `cors` → global `rateLimit` (skips `/health`) → `express.urlencoded`/`json` → `logguer` → routes → `errorMiddleware` (must stay last). CORS is first so 429s and preflights carry CORS headers.
+Order: `cors` → `helmet` → global `rateLimit` (skips `/health`) → `express.urlencoded`/`json` → `morgan` → routes → `errorMiddleware` (must stay last). CORS is first so 429s and preflights carry CORS headers; `helmet` (before the limiter) is the single source of security headers — nginx no longer duplicates them. `morgan` (`dev`/`combined`, skipped in test) replaced the custom `logguer`.
 
 ## Lint notes
 

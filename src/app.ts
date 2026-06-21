@@ -1,10 +1,11 @@
 import express from "express";
 import { dogRouter } from "./routes/dogs.routes";
 import {userRouter} from "./routes/users.routes.js";
-import { logguer } from "./middlewares/logguer";
 import { errorMiddleware } from "./middlewares/error";
 import { rateLimit } from 'express-rate-limit'
 import {auth} from "./middlewares/auth.js";
+import helmet from "helmet";
+import morgan from "morgan";
 import cors from "cors";
 import { env } from "./config/env";
 
@@ -25,6 +26,14 @@ app.set("trust proxy", 1);
 // CORS_ORIGIN accepte une ou plusieurs origines séparées par des virgules.
 const corsOrigins = env.CORS_ORIGIN.split(",").map((o) => o.trim());
 app.use(cors({ origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins }));
+
+// Helmet pose les en-têtes de sécurité HTTP (X-Content-Type-Options,
+// X-Frame-Options, Referrer-Policy, HSTS…) et retire X-Powered-By. Placé avant le
+// rate-limiter pour que même les réponses 429 en bénéficient. Ces en-têtes
+// applicatifs sont la source de vérité unique (nginx ne les duplique plus, ce qui
+// évitait un conflit sur X-XSS-Protection). CSP désactivée : l'API ne sert que du
+// JSON et des fichiers, pas de pages HTML à protéger.
+app.use(helmet({ contentSecurityPolicy: false }));
 
 const limiter = rateLimit({
     windowMs: env.RATE_LIMIT_WINDOW_MS,
@@ -47,7 +56,12 @@ const authLimiter = rateLimit({
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(logguer);
+
+// Journalisation HTTP : `dev` (concis/coloré) en dev, `combined` (avec l'IP réelle
+// résolue via `trust proxy`) en prod, muet en test. Remplace l'ancien `logguer`.
+app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev", {
+  skip: () => env.NODE_ENV === "test",
+}));
 
 app.use("/dogs", auth, dogRouter);
 app.use("/auth", authLimiter, userRouter)
