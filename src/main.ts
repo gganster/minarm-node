@@ -29,7 +29,7 @@ const limiter = rateLimit({
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     skip: (req) => req.path === '/health', // le healthcheck ne doit jamais être throttlé
-    message: { error: 'Trop de requêtes, réessayez plus tard' },
+    message: { status: 429, message: 'Trop de requêtes, réessayez plus tard' },
 })
 app.use(limiter);
 
@@ -39,7 +39,7 @@ const authLimiter = rateLimit({
     limit: env.AUTH_RATE_LIMIT_MAX,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
-    message: { error: 'Trop de tentatives, réessayez plus tard' },
+    message: { status: 429, message: 'Trop de tentatives, réessayez plus tard' },
 })
 
 app.use(express.urlencoded({ extended: true }));

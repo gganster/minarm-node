@@ -20,7 +20,16 @@ export const env = createEnv({
     PORT: z.coerce.number().int().positive().default(3000),
 
     // Auth (les valeurs par défaut correspondent à docker-compose.yml)
-    JWT_EXPIRES_IN: z.string().min(1).default("1d"),
+    // Format accepté par jsonwebtoken : un nombre de secondes ("3600") ou une
+    // durée compacte ("1d", "12h"). Validé au démarrage pour échouer tôt plutôt
+    // que faire throw `jwt.sign` au premier login (-> 500).
+    JWT_EXPIRES_IN: z
+      .string()
+      .regex(
+        /^\d+(?:ms|s|m|h|d|w|y)?$/,
+        'JWT_EXPIRES_IN doit être un nombre de secondes ou une durée (ex. "1d", "12h", "3600").'
+      )
+      .default("1d"),
     BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(10),
 
     // CORS : origine(s) autorisée(s), séparées par des virgules.

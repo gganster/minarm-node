@@ -4,6 +4,7 @@ import type { RequestWithBody } from "../types/http";
 import type { DogInput } from "../schemas/dogs.schema";
 import { HttpError, NotFoundError } from "../middlewares/error";
 import { requireUserId } from "../middlewares/auth";
+import { requireParamId } from "../middlewares/validate";
 import { UPLOADS_DIR } from "../lib/uploads";
 import fs from "node:fs";
 import path from "node:path";
@@ -12,7 +13,7 @@ export const listDogs = async (req: Request, res: Response) => res.json(await Do
 
 export const getDog = async (req: Request, res: Response) => {
   const ownerId = requireUserId(req);
-  const id = Number(req.safeParams.id);
+  const id = requireParamId(req);
   const dog = await DogsService.getDogById(id, ownerId);
 
   if (!dog) throw new NotFoundError;
@@ -26,7 +27,7 @@ export const createDog = async (req: RequestWithBody<DogInput>, res: Response) =
 
 export const updateDog = async (req: RequestWithBody<DogInput>, res: Response) => {
   const ownerId = requireUserId(req);
-  const id = Number(req.safeParams.id);
+  const id = requireParamId(req);
   // Mutation scoppée au propriétaire : count === 0 => le chien n'existe pas OU
   // n'appartient pas au caller -> 404 (pas de fuite d'existence).
   const { count } = await DogsService.updateDog(id, ownerId, req.body);
@@ -39,7 +40,7 @@ export const updateDog = async (req: RequestWithBody<DogInput>, res: Response) =
 
 export const deleteDog = async (req: Request, res: Response) => {
   const ownerId = requireUserId(req);
-  const id = Number(req.safeParams.id);
+  const id = requireParamId(req);
   // On charge d'abord le chien possédé (pour le renvoyer après suppression) ;
   // deleteDog reste lui aussi scoppé par ownerId.
   const dog = await DogsService.getDogById(id, ownerId);
@@ -60,7 +61,7 @@ export const deleteDog = async (req: Request, res: Response) => {
 
 export const upload = async (req: Request, res: Response) => {
   const ownerId = requireUserId(req);
-  const id = Number(req.safeParams.id);
+  const id = requireParamId(req);
 
   if (!req.file) throw new HttpError(400, "Aucun fichier fourni");
 
