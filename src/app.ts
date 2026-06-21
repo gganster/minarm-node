@@ -58,7 +58,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Journalisation HTTP : `dev` (concis/coloré) en dev, `combined` (avec l'IP réelle
-// résolue via `trust proxy`) en prod, muet en test. Remplace l'ancien `logguer`.
+// résolue via `trust proxy`) en prod, muet en test. 
 app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev", {
   skip: () => env.NODE_ENV === "test",
 }));
