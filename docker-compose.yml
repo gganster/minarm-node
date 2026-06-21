@@ -28,6 +28,9 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      # POSTGRES_PASSWORD est injecté tel quel dans cette URL : utiliser un mot de
+      # passe URL-safe (alphanumérique). Un caractère réservé (@ : / # ? % &)
+      # corromprait DATABASE_URL ; sinon, le percent-encoder dans le mot de passe.
       DATABASE_URL: postgres://${POSTGRES_USER:-dogapi}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-dogapi}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET doit être défini (voir .env)}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}

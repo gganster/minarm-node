@@ -45,4 +45,12 @@ dogRouter.post(
   DogController.upload
 );
 
+// Sert une pièce jointe, scoppé au propriétaire (l'autorisation est faite dans
+// le controller). `auth` est déjà appliqué au montage du router (/dogs).
+// `/upload/:filename` (2 segments) ne peut pas entrer en conflit avec `/:id`.
+dogRouter.get(
+  "/upload/:filename",
+  DogController.serveAttachment
+);
+
 export {dogRouter}

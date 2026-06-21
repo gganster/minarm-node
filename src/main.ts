@@ -48,7 +48,6 @@ app.use(logguer);
 
 app.use("/dogs", auth, dogRouter);
 app.use("/auth", authLimiter, userRouter)
-app.use("/upload", auth, express.static("uploads"));
 app.get("/health", (req, res) => res.status(200).send("ok"))
 
 app.use(errorMiddleware);

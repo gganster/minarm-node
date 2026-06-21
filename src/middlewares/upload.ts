@@ -3,8 +3,9 @@ import { HttpError } from "./error";
 import fs from "node:fs";
 import crypto from "node:crypto";
 import { env } from "../config/env";
+import { UPLOADS_DIR } from "../lib/uploads";
 
-fs.mkdirSync("uploads/", {recursive: true});
+fs.mkdirSync(UPLOADS_DIR, {recursive: true});
 
 // Source de vérité unique : mimetypes autorisés -> extension stockée.
 // L'extension est dérivée du mimetype validé (et NON du nom fourni par le
@@ -19,7 +20,7 @@ const MIME_TO_EXT: Record<string, string> = {
 
 export const upload = multer({
   storage: multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, "uploads/"),
+    destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
     filename: (_req, file, cb) => {
       const ext = MIME_TO_EXT[file.mimetype] ?? "";
       cb(null, `${crypto.randomBytes(8).toString("hex")}${ext}`)

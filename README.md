@@ -126,7 +126,7 @@ nginx/                   # configuration du reverse proxy (prod)
 | PUT | `/dogs/:id` | ✅ | `{ name, active? }` |
 | DELETE | `/dogs/:id` | ✅ | suppression |
 | POST | `/dogs/:id/upload` | ✅ | multipart, champ `attachment` (png/jpeg/gif/pdf) |
-| GET | `/upload/*` | ✅ | sert les fichiers uploadés |
+| GET | `/dogs/upload/:filename` | ✅ | sert un fichier uploadé — **propriétaire uniquement** |
 
 ### Base de données & déploiement
 
